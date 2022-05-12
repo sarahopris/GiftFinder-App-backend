@@ -25,6 +25,7 @@ public class User {
     private String email;
     @Column(unique = true)
     private String username;
+
     private String password;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -43,8 +44,18 @@ public class User {
     }
 
 
+    public boolean isValidPassword()
+    {   String passwordValidationRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>_]).{8,20}$";
+        Pattern pattern = Pattern.compile(passwordValidationRegex);
+        Matcher matcher = pattern.matcher(password);
+        return matcher.matches();
+    }
+
+
+
+
     public boolean isValid() {
-        return username != null && email!= null && isValidEmail();
+        return username != null && email!= null && isValidEmail() && isValidPassword();
     }
 
 }

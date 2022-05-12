@@ -4,6 +4,9 @@ import com.bachelorwork.backend.dto.UserDTO;
 import com.bachelorwork.backend.model.User;
 import com.bachelorwork.backend.repository.IUserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +22,9 @@ public class UserService {
 
     @Autowired
     private IUserRepo iUserRepo;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public List<UserDTO> findAll() {
         return ((List<User>) iUserRepo.findAll()).stream()
@@ -43,6 +49,7 @@ public class UserService {
                 .email(userDTO.getEmail())
                 .username(userDTO.getUsername())
                 .password(userDTO.getPassword())
+                .selectedTags(userDTO.getSelectedTags())
 //                .password(passwordEncoder.encode(userDTO.getPassword()))
 
                // .userNotificationsList(userDTO.getUserNotificationsList())
@@ -89,23 +96,34 @@ public class UserService {
 
     }
 
-
-    public String addUser(UserDTO userDTO) {
-        // username and email can not be null
-
-        if ( userDTO.getUsername() == null || userDTO.getEmail() == null) {
-
-            return "User not added to the database! You have to specify your first name, last name, mobile number and email to be able to add a new user.";
-        }
+    @Transactional
+    public ResponseEntity<?> addUser(UserDTO userDTO) {
+//         username and email can not be null
+//        if ( userDTO.getUsername() == null || userDTO.getEmail() == null) {
+//            return "User not added to the database! You have to specify your username and email to be able to add a new user.";
+//        }
         userDTO.setUsername(userDTO.getUsername());
-
         User user = convertToUser(userDTO);
-        user.setPassword(userDTO.getPassword());
-
+        if(user.isValidPassword()) {
+            user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        }
+        else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if (user.isValidEmail()) {
             iUserRepo.save(user);
-            return userDTO.getUsername() + " added successfully!";
-        } else return "invalid email address";
-
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
+
+    public UserDTO updateUser(UserDTO userDto) {
+        User user = iUserRepo.findByUsername(userDto.getUsername());
+        if (user == null)
+            return null;
+        User userToSave = convertToUser(userDto);
+
+        userToSave.setPassword(passwordEncoder.encode(userToSave.getPassword()));
+        userToSave.setIdUser(user.getIdUser());
+        return convertToUserDTO(iUserRepo.save(userToSave));
+    }
+
 }

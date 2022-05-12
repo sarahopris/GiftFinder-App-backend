@@ -16,5 +16,5 @@ public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long idTag;
-    private TagEnum tagName;
+    private String tagName;
 }

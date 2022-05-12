@@ -5,6 +5,7 @@ import com.bachelorwork.backend.dto.UserDTO;
 import com.bachelorwork.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,9 +29,13 @@ public class UserController {
     }
 
     @PostMapping("/addUser")
-    public String addUser(@RequestBody UserDTO userDto) {
+    public ResponseEntity<?> addUser(@RequestBody UserDTO userDto) {
         return userService.addUser(userDto);
     }
 
+    @PutMapping("/changeUser")
+    public UserDTO changeUser(@RequestBody UserDTO userDto) {
+        return userService.updateUser(userDto);
+    }
 
 }
