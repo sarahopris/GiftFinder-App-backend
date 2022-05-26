@@ -20,7 +20,8 @@ public class UserDTO extends RepresentationModel<UserDTO> {
     private String email;
     private String username;
     private String password;
-    private List<Tag> selectedTags;
+    private List<Tag> mandatoryTags;
+    private List<Tag> optionalTags;
     private String token;
 
 

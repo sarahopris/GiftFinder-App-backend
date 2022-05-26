@@ -2,7 +2,7 @@ package com.bachelorwork.backend.security;
 
 import com.bachelorwork.backend.dto.LoginData;
 import com.bachelorwork.backend.model.User;
-import com.bachelorwork.backend.repository.IUserRepo;
+import com.bachelorwork.backend.repository.IUserRepository;
 import com.bachelorwork.backend.service.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Service
 public class UserSecurityService {
     @Autowired
-    private IUserRepo iUserRepo;
+    private IUserRepository iUserRepository;
 
     @Autowired
     private UserService userService;
@@ -35,7 +35,7 @@ public class UserSecurityService {
 
     public ResponseEntity<?> login(LoginData loginData) throws Exception {
 
-        User user = iUserRepo.findByUsername(loginData.getUsername());
+        User user = iUserRepository.findByUsername(loginData.getUsername());
         if (user != null) {
             if (!passwordEncoder.matches(loginData.getPassword(), user.getPassword())) {
                 // the password is not correct
@@ -44,7 +44,7 @@ public class UserSecurityService {
             else {
                 String token = getJWTToken(loginData.getUsername());
                 user.setToken(token);
-                iUserRepo.save(user);
+                iUserRepository.save(user);
                 return new ResponseEntity<>(userService.convertToUserDTO(user), HttpStatus.OK);
 
             }
@@ -79,7 +79,7 @@ public class UserSecurityService {
 
     public ResponseEntity<?> logout(String username) throws Exception{
 
-        User user = iUserRepo.findByUsername(username);
+        User user = iUserRepository.findByUsername(username);
 
         if (user == null) {
             return new ResponseEntity<>(user, HttpStatus.NOT_FOUND);
@@ -90,7 +90,7 @@ public class UserSecurityService {
         }
 
         user.setToken(null);
-        iUserRepo.save(user);
+        iUserRepository.save(user);
         System.out.println("logout in service");
         return new ResponseEntity<>(userService.convertToUserDTO(user), HttpStatus.OK);
     }

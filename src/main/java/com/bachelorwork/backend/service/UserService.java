@@ -2,7 +2,7 @@ package com.bachelorwork.backend.service;
 
 import com.bachelorwork.backend.dto.UserDTO;
 import com.bachelorwork.backend.model.User;
-import com.bachelorwork.backend.repository.IUserRepo;
+import com.bachelorwork.backend.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,32 +15,35 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Service
 public class UserService {
 
     @Autowired
-    private IUserRepo iUserRepo;
+    private IUserRepository iUserRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     public List<UserDTO> findAll() {
-        return ((List<User>) iUserRepo.findAll()).stream()
+        return ((List<User>) iUserRepository.findAll()).stream()
                 .map(this::convertToUserDTO).collect(Collectors.toList());
     }
 
     public UserDTO findById(Long id) {
-        return iUserRepo.findById(id).stream().map(this::convertToUserDTO).findFirst().orElse(null);
+        return iUserRepository.findById(id).stream().map(this::convertToUserDTO).findFirst().orElse(null);
     }
 
+
+    public UserDTO findByUsername(String username) {
+        return iUserRepository.findUserByUsername(username).stream().map(this::convertToUserDTO).findFirst().orElse(null);
+    }
 
     @Transactional
     public boolean deleteUserById(Long id) {
         if (findById(id) == null)
             return false;
-        iUserRepo.deleteById(id);
+        iUserRepository.deleteById(id);
         return true;
     }
 
@@ -49,7 +52,8 @@ public class UserService {
                 .email(userDTO.getEmail())
                 .username(userDTO.getUsername())
                 .password(userDTO.getPassword())
-                .selectedTags(userDTO.getSelectedTags())
+                .mandatoryTags(userDTO.getMandatoryTags())
+                .optionalTags(userDTO.getOptionalTags())
 //                .password(passwordEncoder.encode(userDTO.getPassword()))
 
                // .userNotificationsList(userDTO.getUserNotificationsList())
@@ -64,7 +68,8 @@ public class UserService {
                 .username(user.getUsername())
                 .token(user.getToken())
 //                .password(user.getPassword())
-                .selectedTags(user.getSelectedTags())
+                .mandatoryTags(user.getMandatoryTags())
+                .optionalTags(user.getOptionalTags())
                 .build();
 //        userDTO.add(linkTo(UserController.class).slash(user.getIdUser()).withSelfRel());
 //        userDTO.add(linkTo(methodOn(BugController.class).findBugsAssignedTo(userDTO.getUsername())).withRel("AsignedTo"));
@@ -87,7 +92,7 @@ public class UserService {
         }
 
         String username = nume + prenume;
-        while (iUserRepo.findByUsername(username) != null) {
+        while (iUserRepository.findByUsername(username) != null) {
             username = nume + prenume + Integer.toString(i);
             i++;
         }
@@ -109,21 +114,21 @@ public class UserService {
         }
         else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if (user.isValidEmail()) {
-            iUserRepo.save(user);
+            iUserRepository.save(user);
             return new ResponseEntity<>(HttpStatus.OK);
         }
         else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     public UserDTO updateUser(UserDTO userDto) {
-        User user = iUserRepo.findByUsername(userDto.getUsername());
+        User user = iUserRepository.findByUsername(userDto.getUsername());
         if (user == null)
             return null;
         User userToSave = convertToUser(userDto);
 
         userToSave.setPassword(passwordEncoder.encode(userToSave.getPassword()));
         userToSave.setIdUser(user.getIdUser());
-        return convertToUserDTO(iUserRepo.save(userToSave));
+        return convertToUserDTO(iUserRepository.save(userToSave));
     }
 
 }

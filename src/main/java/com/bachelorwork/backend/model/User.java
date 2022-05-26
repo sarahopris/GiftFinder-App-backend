@@ -6,6 +6,7 @@ import lombok.*;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,10 +30,16 @@ public class User {
     private String password;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "users_tags",
+    @JoinTable(name = "user_tag",
                 joinColumns = @JoinColumn(name = "users_id_user"),
                 inverseJoinColumns = @JoinColumn( name = "tags_id_tags"))
-    private List<Tag> selectedTags = new ArrayList<>();
+    private List<Tag> optionalTags = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_tag",
+            joinColumns = @JoinColumn(name = "users_id_user"),
+            inverseJoinColumns = @JoinColumn( name = "tags_id_tags"))
+    private List<Tag> mandatoryTags = new ArrayList<>();
     private String token;
 
 
@@ -51,7 +58,9 @@ public class User {
         return matcher.matches();
     }
 
-
+//    public boolean isValidUsername(){
+//
+//    }
 
 
     public boolean isValid() {

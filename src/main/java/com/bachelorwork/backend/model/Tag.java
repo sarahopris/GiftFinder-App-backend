@@ -11,10 +11,13 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "tag")
+@Table(name = "tag", schema = "public")
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long idTag;
+
+    @Column(unique = true)
     private String tagName;
+    private Short mandatory;
 }
