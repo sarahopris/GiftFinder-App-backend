@@ -42,52 +42,47 @@ public class UserTagService {
 //                .executeUpdate();
 //    }
 
-    public ResponseEntity<?> addTagToUser(String username, String[] tagNames){
+    public ResponseEntity<?> addTagToUser(String username, String[] tagNames) {
         Optional<User> user = iUserRepository.findUserByUsername(username);
         //Tag tag  = tagService.findByTagName(tagName);
 
-        if(user.isPresent()) {
-            Set<Tag> mandatoryTagList = new HashSet<>(user.get().getMandatoryTags()).stream().filter(tag->tag.getMandatory() ==1).collect(Collectors.toSet());
-            Set<Tag> optionalTagList = new HashSet<>(user.get().getOptionalTags()).stream().filter(tag->tag.getMandatory() ==0).collect(Collectors.toSet());
+        if (user.isPresent()) {
+            Set<Tag> mandatoryTagList = new HashSet<>(user.get().getMandatoryTags()).stream().filter(tag -> tag.getMandatory() == 1).collect(Collectors.toSet());
+            Set<Tag> optionalTagList = new HashSet<>(user.get().getOptionalTags()).stream().filter(tag -> tag.getMandatory() == 0).collect(Collectors.toSet());
 
-            //List<Tag> allTags = new ArrayList<>();
             for (String tag : tagNames) {
                 Tag tagAux = tagService.findByTagName(tag);
                 if (tagAux != null) {
-                    //allTags.add(tagAux);
                     if (tagAux.getMandatory() == 1)
                         mandatoryTagList.add(tagAux);
-                    else if(tagAux.getMandatory() == 0){
+                    else if (tagAux.getMandatory() == 0) {
                         optionalTagList.add(tagAux);
                     }
                 }
             }
-//        mandatoryTagList = allTags.stream().filter(tag -> tag.getMandatory() ==1 ).collect(Collectors.toList());
-//        optionalTagList = allTags.stream().filter(tag -> tag.getMandatory() ==0 ).collect(Collectors.toList());
             List<Tag> mandatoryTags = new ArrayList<>(mandatoryTagList);
             List<Tag> optionalTags = new ArrayList<>(optionalTagList);
             user.get().setMandatoryTags(mandatoryTags);
             user.get().setOptionalTags(optionalTags);
             iUserRepository.save(user.get());
             return new ResponseEntity<>("tags added", HttpStatus.OK);
-        }
-        else
+        } else
             return new ResponseEntity<>("user not found", HttpStatus.NOT_FOUND);
     }
 
-    public List<Tag> getMandatoryTags(String username){
+    public List<Tag> getMandatoryTags(String username) {
         Optional<User> user = iUserRepository.findUserByUsername(username);
-        if(user.isEmpty()){
+        if (user.isEmpty()) {
             return null;
         }
-        return user.get().getMandatoryTags().stream().filter(tag->tag.getMandatory() == 1).collect(Collectors.toList());
+        return user.get().getMandatoryTags().stream().filter(tag -> tag.getMandatory() == 1).collect(Collectors.toList());
     }
 
-    public List<Tag> getOptionalTags(String username){
+    public List<Tag> getOptionalTags(String username) {
         Optional<User> user = iUserRepository.findUserByUsername(username);
-        if(user.isEmpty()){
+        if (user.isEmpty()) {
             return null;
         }
-        return user.get().getOptionalTags().stream().filter(tag->tag.getMandatory() == 0).collect(Collectors.toList());
+        return user.get().getOptionalTags().stream().filter(tag -> tag.getMandatory() == 0).collect(Collectors.toList());
     }
 }

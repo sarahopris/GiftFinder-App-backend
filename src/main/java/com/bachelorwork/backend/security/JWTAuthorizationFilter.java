@@ -30,7 +30,7 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
                 } else {
                     SecurityContextHolder.clearContext();
                 }
-            }else {
+            } else {
                 SecurityContextHolder.clearContext();
             }
             chain.doFilter(request, response);
@@ -48,6 +48,7 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
     /**
      * Authentication method in Spring flow
+     *
      * @param claims
      */
     private void setUpSpringAuthentication(Claims claims) {

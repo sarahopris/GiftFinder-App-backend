@@ -22,13 +22,16 @@ public class UserService {
     @Autowired
     private IUserRepository iUserRepository;
 
+
     @Autowired
     private PasswordEncoder passwordEncoder;
+
 
     public List<UserDTO> findAll() {
         return ((List<User>) iUserRepository.findAll()).stream()
                 .map(this::convertToUserDTO).collect(Collectors.toList());
     }
+
 
     public UserDTO findById(Long id) {
         return iUserRepository.findById(id).stream().map(this::convertToUserDTO).findFirst().orElse(null);
@@ -38,6 +41,7 @@ public class UserService {
     public UserDTO findByUsername(String username) {
         return iUserRepository.findUserByUsername(username).stream().map(this::convertToUserDTO).findFirst().orElse(null);
     }
+
 
     @Transactional
     public boolean deleteUserById(Long id) {
@@ -56,7 +60,7 @@ public class UserService {
                 .optionalTags(userDTO.getOptionalTags())
 //                .password(passwordEncoder.encode(userDTO.getPassword()))
 
-               // .userNotificationsList(userDTO.getUserNotificationsList())
+                // .userNotificationsList(userDTO.getUserNotificationsList())
                 .build();
     }
 
@@ -76,6 +80,7 @@ public class UserService {
 //        userDTO.add(linkTo(methodOn(BugController.class).findBugsCreatedBy(userDTO.getUsername())).withRel("CreatedBy"));
         return userDTO;
     }
+
 
     public String generateUsername(String firstName, String lastName) {
         firstName = firstName.toLowerCase(Locale.ROOT);
@@ -109,16 +114,15 @@ public class UserService {
 //        }
         userDTO.setUsername(userDTO.getUsername());
         User user = convertToUser(userDTO);
-        if(user.isValidPassword()) {
+        if (user.isValidPassword()) {
             user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        }
-        else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if (user.isValidEmail()) {
             iUserRepository.save(user);
             return new ResponseEntity<>(HttpStatus.OK);
-        }
-        else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
+
 
     public UserDTO updateUser(UserDTO userDto) {
         User user = iUserRepository.findByUsername(userDto.getUsername());

@@ -22,26 +22,31 @@ public class UserController {
     @Autowired
     private IUserRepository iUserRepository;
 
+
     @GetMapping(value = "/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public List<UserDTO> findAll() {
         return userService.findAll();
     }
 
+
     @GetMapping(value = "/getById/id={id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserDTO findById(@PathVariable("id") Long id) {
         return userService.findById(id);
     }
+
 
     @GetMapping(value = "/getByUsername/username={username}", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserDTO findByUsername(@PathVariable("username") String username) {
         return userService.findByUsername(username);
     }
 
+
     @PostMapping("/addUser")
     public ResponseEntity<?> addUser(@RequestBody UserDTO userDto) {
         return userService.addUser(userDto);
     }
+
 
     @PutMapping("/changeUser")
     public UserDTO changeUser(@RequestBody UserDTO userDto) {

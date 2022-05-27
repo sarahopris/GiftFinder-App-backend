@@ -34,18 +34,19 @@ public class TagService {
 
     @Transactional
     public ResponseEntity<?> addTag(Tag tag) {
-//         username and email can not be null
-//        if ( userDTO.getUsername() == null || userDTO.getEmail() == null) {
-//            return "User not added to the database! You have to specify your username and email to be able to add a new user.";
-//        }
-        tag.setTagName(tag.getTagName());
-
-        if(tag.getMandatory() != 1) {
-            tag.setMandatory((short) 0);
+        Tag tagToAdd = new Tag();
+        if(findByTagName(tag.getTagName()) !=null){
+            return new ResponseEntity<>("tag already exists", HttpStatus.BAD_REQUEST);
         }
-        else tag.setMandatory(tag.getMandatory());
+        else {
+            tagToAdd.setTagName(tag.getTagName());
 
-        iTagRepository.save(tag);
+            if (tag.getMandatory() != 1) {
+                tagToAdd.setMandatory((short) 0);
+            } else tagToAdd.setMandatory(tag.getMandatory());
+
+            iTagRepository.save(tagToAdd);
+        }
         return new ResponseEntity<>("added tag", HttpStatus.OK);
     }
 
