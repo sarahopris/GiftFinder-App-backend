@@ -2,6 +2,7 @@ package com.bachelorwork.backend.controller;
 
 import com.bachelorwork.backend.model.Category;
 import com.bachelorwork.backend.model.Item;
+import com.bachelorwork.backend.model.Tag;
 import com.bachelorwork.backend.service.ItemService;
 import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,5 +56,10 @@ public class ItemController {
     @PostMapping("/addTagsToItem")
     public ResponseEntity<?> addTagsToItem(@RequestParam String item,@RequestParam String[] tags){
         return itemService.addTagToItem(item,tags);
+    }
+
+    @PostMapping(value = "/addItems", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> addTag(@RequestBody Map<String, List<Item>> itemMap){
+        return itemService.addItemList(itemMap);
     }
 }

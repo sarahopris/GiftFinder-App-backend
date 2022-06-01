@@ -135,6 +135,35 @@ public class ItemService {
     }
 
     @Transactional
+    public ResponseEntity<?> addItemList(Map<String, List<Item>> itemsToAdd){
+
+        for(Map.Entry<String,List<Item>> entry: itemsToAdd.entrySet()){
+            Category category = categoryService.findByCategoryName(entry.getKey());
+            if(category == null){
+                return new ResponseEntity<>("This category does not exist. Please add first the category",
+                        HttpStatus.BAD_REQUEST);
+            }
+            for(Item item: entry.getValue()){
+                if(itemRepository.findByItemName(item.getItemName()).isPresent()) {
+                    return new ResponseEntity<>("Item already exists",
+                            HttpStatus.OK);
+                }
+                item.setItemName(item.getItemName());
+                item.setCategory(category);
+                item.setImgName(item.getImgName());
+                category.getItemList().add(item);
+                category.setItemList(category.getItemList());
+                itemRepository.save(item);
+                iCategoryRepository.save(category);
+        }
+    }
+
+        return new ResponseEntity<>("items added",
+                HttpStatus.OK);
+
+    }
+
+    @Transactional
     public Map<String, URL> getItemImageURL(Item item) throws IOException {
         Map<String, URL> itemImageURL = new HashMap<>();
         if(itemRepository.findByItemName(item.getItemName()).isEmpty())

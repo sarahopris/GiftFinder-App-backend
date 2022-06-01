@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class CategoryService {
 
@@ -20,14 +22,16 @@ public class CategoryService {
     }
 
     @Transactional
-    public ResponseEntity<?> addCategory(Category category){
-        Category categoryToSave = new Category();
-        if(findByCategoryName(category.getName()) != null)
-            return new ResponseEntity<>("already existent", HttpStatus.BAD_REQUEST);
-        categoryToSave.setName(category.getName());
-        iCategoryRepository.save(categoryToSave);
+    public ResponseEntity<?> addCategory(List<Category> categoryList){
+        for(Category category: categoryList) {
+            Category categoryToSave = new Category();
+            if (findByCategoryName(category.getName()) != null)
+                return new ResponseEntity<>("already existent", HttpStatus.BAD_REQUEST);
+            categoryToSave.setName(category.getName());
+            iCategoryRepository.save(categoryToSave);
 
-        return new ResponseEntity<>("category added", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("categories added", HttpStatus.OK);
     }
 
 
