@@ -35,7 +35,7 @@ public class TagService {
     @Transactional
     public ResponseEntity<?> addTag(Tag tag) {
         Tag tagToAdd = new Tag();
-        if(findByTagName(tag.getTagName()) !=null){
+        if(findByTagName(tag.getTagName()) != null){
             return new ResponseEntity<>("tag already exists", HttpStatus.BAD_REQUEST);
         }
         else {

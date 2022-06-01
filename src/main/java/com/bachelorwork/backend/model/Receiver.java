@@ -14,25 +14,24 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "item")
-public class Item {
+@Table(name = "receiver")
+public class Receiver {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long idItem;
-    private String itemName;
+    private Long id;
+
+    private String name;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "category_id_category")
+    @JoinColumn(name = "user_id_user")
     @JsonIgnore
-    private Category category;
-
-    private String imgName;
+    private User user;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "item_tags",
-            joinColumns = @JoinColumn(name = "item_id_item"),
-            inverseJoinColumns = @JoinColumn( name = "tags_id_tags"))
+    @JoinTable(name = "receiver_tag",
+            joinColumns = @JoinColumn(name = "id_receiver"),
+            inverseJoinColumns = @JoinColumn( name = "id_tag"))
     private List<Tag> tagList = new ArrayList<>();
-
 
 }

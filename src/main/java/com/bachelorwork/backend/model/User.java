@@ -29,11 +29,13 @@ public class User {
 
     private String password;
 
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_tag",
                 joinColumns = @JoinColumn(name = "users_id_user"),
                 inverseJoinColumns = @JoinColumn( name = "tags_id_tags"))
     private List<Tag> optionalTags = new ArrayList<>();
+
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_tag",
@@ -41,6 +43,10 @@ public class User {
             inverseJoinColumns = @JoinColumn( name = "tags_id_tags"))
     private List<Tag> mandatoryTags = new ArrayList<>();
     private String token;
+
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Receiver> receiversList;
 
 
     public boolean isValidEmail() {
