@@ -40,8 +40,8 @@ public class TagController {
     }
 
     @PostMapping("/addTag")
-    public ResponseEntity<?> addTag(@RequestBody Tag tag){
-        return tagService.addTag(tag);
+    public ResponseEntity<?> addTag(@RequestBody List<Tag> tagList){
+        return tagService.addTag(tagList);
     }
 
 }

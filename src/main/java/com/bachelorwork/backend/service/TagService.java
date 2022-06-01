@@ -33,21 +33,22 @@ public class TagService {
 
 
     @Transactional
-    public ResponseEntity<?> addTag(Tag tag) {
+    public ResponseEntity<?> addTag(List<Tag> tagList) {
         Tag tagToAdd = new Tag();
-        if(findByTagName(tag.getTagName()) != null){
-            return new ResponseEntity<>("tag already exists", HttpStatus.BAD_REQUEST);
-        }
-        else {
-            tagToAdd.setTagName(tag.getTagName());
+        for(Tag tag: tagList) {
+            if (findByTagName(tag.getTagName()) != null) {
+                return new ResponseEntity<>("tag already exists", HttpStatus.BAD_REQUEST);
+            } else {
+                tagToAdd.setTagName(tag.getTagName());
 
-            if (tag.getMandatory() != 1) {
-                tagToAdd.setMandatory((short) 0);
-            } else tagToAdd.setMandatory(tag.getMandatory());
+                if (tag.getMandatory() != 1) {
+                    tagToAdd.setMandatory((short) 0);
+                } else tagToAdd.setMandatory(tag.getMandatory());
 
-            iTagRepository.save(tagToAdd);
+                iTagRepository.save(tagToAdd);
+            }
         }
-        return new ResponseEntity<>("added tag", HttpStatus.OK);
+        return new ResponseEntity<>("tags added", HttpStatus.OK);
     }
 
 }
