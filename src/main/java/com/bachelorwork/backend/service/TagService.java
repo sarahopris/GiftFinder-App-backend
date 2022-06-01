@@ -34,10 +34,11 @@ public class TagService {
 
     @Transactional
     public ResponseEntity<?> addTag(List<Tag> tagList) {
-        Tag tagToAdd = new Tag();
+
         for(Tag tag: tagList) {
+            Tag tagToAdd = new Tag();
             if (findByTagName(tag.getTagName()) != null) {
-                return new ResponseEntity<>("tag already exists", HttpStatus.BAD_REQUEST);
+                continue;
             } else {
                 tagToAdd.setTagName(tag.getTagName());
 
