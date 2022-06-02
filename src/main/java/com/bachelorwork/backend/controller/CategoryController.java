@@ -1,6 +1,7 @@
 package com.bachelorwork.backend.controller;
 
 import com.bachelorwork.backend.model.Category;
+import com.bachelorwork.backend.model.Item;
 import com.bachelorwork.backend.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -22,6 +23,10 @@ public class CategoryController {
         return categoryService.addCategory(categoryList);
     }
 
+    @GetMapping(value ="/getCategoryByItem", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getCategoryBy(@RequestBody Item item){
+        return categoryService.findByItem(item);
+    }
 
 
 

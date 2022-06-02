@@ -35,23 +35,23 @@ public class ItemController {
         return itemService.findAll();
     }
 
-    //map cu numele categoriei
+
     @GetMapping(value = "/getItemsByCategory", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public List<Item> getItemsByCategory(@RequestBody Category category){
         return itemService.findByCategory(category);
     }
 
-    @GetMapping(value = "/getItemsListsByCategory", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public List<JSONObject> getItemsListsByCategory(){
-        return itemService.getItemListsByCategories();
-    }
+//    @GetMapping(value = "/getItemsListsByCategory", produces = MediaType.APPLICATION_JSON_VALUE)
+//    @ResponseBody
+//    public List<JSONObject> getItemsListsByCategory(){
+//        return itemService.getItemListsByCategories();
+//    }
 
-    @GetMapping(value="/getImageURL")
-    public Map<String, URL> getItemImageURL(@RequestBody Item item) throws IOException {
-        return itemService.getItemImageURL(item);
-    }
+//    @GetMapping(value="/getImageURL")
+//    public Map<String, URL> getItemImageURL(@RequestBody Item item) throws IOException {
+//        return itemService.getItemImageURL(item);
+//    }
 
     @PostMapping("/addTagsToItem")
     public ResponseEntity<?> addTagsToItem(@RequestParam String item,@RequestParam String[] tags){
@@ -61,5 +61,18 @@ public class ItemController {
     @PostMapping(value = "/addItems", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addTag(@RequestBody Map<String, List<Item>> itemMap){
         return itemService.addItemList(itemMap);
+    }
+
+
+    /**
+     * Method to retrieve items with their image URL and category
+     * @param itemList
+     * @return list of JSON objects of type [ {itemName, itemImgURL, category} ]
+     * @throws IOException
+     */
+    @GetMapping(value = "/getItemsLists", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public List<JSONObject> getItemsLists(@RequestBody List<Item> itemList) throws IOException {
+        return itemService.getItemNameAndImage(itemList);
     }
 }

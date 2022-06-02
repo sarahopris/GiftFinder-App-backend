@@ -163,6 +163,7 @@ public class ItemService {
 
     }
 
+
     @Transactional
     public Map<String, URL> getItemImageURL(Item item) throws IOException {
         Map<String, URL> itemImageURL = new HashMap<>();
@@ -171,6 +172,28 @@ public class ItemService {
         itemImageURL.put(item.getItemName(),FindFilesByName.getGoogleFilesByName(item.getImgName()));
         return itemImageURL;
     }
+
+
+
+    @Transactional
+    public List<JSONObject> getItemNameAndImage(List<Item> itemList) throws IOException {
+        List<JSONObject> jsonObjects = new ArrayList<>();
+        for(Item item: itemList){
+            JSONObject itemsJSON = new JSONObject();
+            itemsJSON.put("itemName", item.getItemName());
+            itemsJSON.put("category", categoryService.findByItem(item));
+            try {
+                itemsJSON.put("imgURL", FindFilesByName.getGoogleFilesByName(item.getImgName()));
+            }
+            catch (IndexOutOfBoundsException indexOutOfBoundsException){
+                itemsJSON.put("imgURL", null);
+            }
+            jsonObjects.add(itemsJSON);
+        }
+        return jsonObjects;
+    }
+
+
 
     @Transactional
     public ResponseEntity<?> addTagToItem(String itemName, String[] tagNames) {

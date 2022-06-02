@@ -1,7 +1,9 @@
 package com.bachelorwork.backend.service;
 
 import com.bachelorwork.backend.model.Category;
+import com.bachelorwork.backend.model.Item;
 import com.bachelorwork.backend.repository.ICategoryRepository;
+import com.bachelorwork.backend.repository.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +18,18 @@ public class CategoryService {
     @Autowired
     ICategoryRepository iCategoryRepository;
 
+    @Autowired
+    ItemRepository itemRepository;
+
 
     public Category findByCategoryName(String categoryName){
         return iCategoryRepository.findByName(categoryName).stream().findFirst().orElse(null);
+    }
+
+    public String findByItem(Item item){
+        if(itemRepository.findById(item.getIdItem()).isPresent())
+            return iCategoryRepository.findByItemListContains(item).getName();
+        return null;
     }
 
     @Transactional

@@ -45,6 +45,7 @@ public class ReceiverService {
                     HttpStatus.BAD_REQUEST);
         }
         if(user.get().getReceiversList().stream().anyMatch(receiverElem -> receiverElem.getName().equals(receiverName))) {
+
             return new ResponseEntity<>("This receiver already exists",
                     HttpStatus.BAD_REQUEST);
         }
@@ -59,19 +60,30 @@ public class ReceiverService {
 
     }
 
-    public ResponseEntity<?> removeReceiver(String receiverName, String username){
-        Receiver receiver = findByReceiverName(receiverName);
-        Optional<User> user = iUserRepository.findUserByUsername(username);
+//    public ResponseEntity<?> removeReceiver(String receiverName, String username){
+//        Receiver receiver = findByReceiverName(receiverName);
+//        Optional<User> user = iUserRepository.findUserByUsername(username);
+//
+//        if(receiver != null && user.isPresent()){
+//            User userObj = user.get();
+//            if(userObj.getReceiversList().contains(receiver)) {
+//                userObj.getReceiversList().remove(receiver);
+//                iReceiverRepository.delete(receiver);
+//                iUserRepository.save(userObj);
+//                return new ResponseEntity<>(HttpStatus.OK);
+//            }
+//            else return new ResponseEntity<>("User doesn't have this receiver", HttpStatus.NOT_FOUND);
+//        }
+//        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//    }
 
-        if(receiver != null && user.isPresent()){
-            User userObj = user.get();
-            if(userObj.getReceiversList().contains(receiver)) {
-                userObj.getReceiversList().remove(receiver);
-                iReceiverRepository.delete(receiver);
-                iUserRepository.save(userObj);
-                return new ResponseEntity<>(HttpStatus.OK);
-            }
-            else return new ResponseEntity<>("User doesn't have this receiver", HttpStatus.NOT_FOUND);
+    public ResponseEntity<?> removeReceiver(String receiverName){
+        Receiver receiver = findByReceiverName(receiverName);
+        //Optional<User> user = iUserRepository.findUserByUsername(username);
+
+        if(receiver != null){
+            iReceiverRepository.delete(receiver);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
@@ -88,11 +100,11 @@ public class ReceiverService {
         Optional<User> user = iUserRepository.findUserByUsername(username);
         //Tag tag  = tagService.findByTagName(tagName);
         //Receiver receiver = Receiver.builder().name(receiverName).build();
+        ResponseEntity<?> addReceiverResponse = addReceiver(receiverName, username);
 
         if(user.isPresent()) {
-            Receiver receiver = user.get().getReceiversList().stream().filter(receiverElem -> receiverElem.getName().equals(receiverName)).findFirst().orElse(null);
-
-            if (receiver != null) {
+            if(addReceiverResponse.equals(new ResponseEntity<>(HttpStatus.OK))){
+                Receiver receiver = user.get().getReceiversList().stream().filter(receiverElem -> receiverElem.getName().equals(receiverName)).findFirst().get();
                 Set<Tag> tagSet = new HashSet<>(receiver.getTagList());
 
                 for (String tag : tagNames) {
@@ -106,8 +118,13 @@ public class ReceiverService {
                 receiver.setTagList(allTags);
                 iReceiverRepository.save(receiver);
                 return new ResponseEntity<>("tags added", HttpStatus.OK);
-            } else
-                return new ResponseEntity<>("User does not have receiver", HttpStatus.NOT_FOUND);
+            }
+            else if(addReceiverResponse.equals(new ResponseEntity<>("This receiver already exists",
+                    HttpStatus.BAD_REQUEST))){
+                return addReceiverResponse;
+            }
+
+            return new ResponseEntity<>("Failed to add receiver", HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
     }

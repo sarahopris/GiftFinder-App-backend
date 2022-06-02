@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,6 +51,11 @@ public class TagService {
             }
         }
         return new ResponseEntity<>("tags added", HttpStatus.OK);
+    }
+
+    public List<Tag> getOptionalTags() {
+        List<Tag> allTags = findAll();
+        return allTags.stream().filter(tag-> tag.getMandatory() == 0).collect(Collectors.toList());
     }
 
 }

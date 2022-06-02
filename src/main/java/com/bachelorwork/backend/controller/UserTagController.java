@@ -22,10 +22,10 @@ public class UserTagController {
         return userTagService.addTagToUser(username,tags);
     }
 
-    @GetMapping(value = "/getMandatoryTags", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Tag> getMandatoryTags(@RequestParam String username){
-        return userTagService.getMandatoryTags(username);
-    }
+//    @GetMapping(value = "/getMandatoryTags", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public List<Tag> getMandatoryTags(@RequestParam String username){
+//        return userTagService.getMandatoryTags(username);
+//    }
 
     @GetMapping(value = "/getOptionalTags", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Tag> getOptionalTags(@RequestParam String username){

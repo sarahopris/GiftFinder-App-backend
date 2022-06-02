@@ -21,11 +21,18 @@ public class ReceiverController {
     }
 
 
+
     @DeleteMapping("/deleteReceiver")
-    public ResponseEntity<?> deleteReceiver(@RequestParam String receiverName, @RequestParam String username){
-        return receiverService.removeReceiver(receiverName, username);
+    public ResponseEntity<?> deleteReceiver(@RequestParam String receiverName){
+        return receiverService.removeReceiver(receiverName);
     }
 
+    /**
+     * @param receiverName
+     * @param tags
+     * @param username
+     * @return ResponseEntity OK - if Receiver and Tags added successfully
+     */
     @PostMapping("/addTagsToReceiver")
     public ResponseEntity<?> addTagsToReceiver(@RequestParam String receiverName, @RequestParam String[] tags, @RequestParam String username){
         return receiverService.addTagToReceiver(receiverName, tags, username);

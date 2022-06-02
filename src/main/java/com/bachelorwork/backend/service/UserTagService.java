@@ -70,13 +70,7 @@ public class UserTagService {
             return new ResponseEntity<>("user not found", HttpStatus.NOT_FOUND);
     }
 
-    public List<Tag> getMandatoryTags(String username) {
-        Optional<User> user = iUserRepository.findUserByUsername(username);
-        if (user.isEmpty()) {
-            return null;
-        }
-        return user.get().getMandatoryTags().stream().filter(tag -> tag.getMandatory() == 1).collect(Collectors.toList());
-    }
+
 
     public List<Tag> getOptionalTags(String username) {
         Optional<User> user = iUserRepository.findUserByUsername(username);

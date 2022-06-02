@@ -44,4 +44,14 @@ public class TagController {
         return tagService.addTag(tagList);
     }
 
+    /**
+     *
+     * @return Lista cu tag-urile optionale
+     */
+    @GetMapping(value = "/getAllOptionalTags", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public List<Tag> findAllOptionalTags() {
+        return tagService.getOptionalTags();
+    }
+
 }
