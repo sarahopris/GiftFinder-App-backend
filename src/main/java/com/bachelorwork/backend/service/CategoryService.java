@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @Service
@@ -24,6 +25,10 @@ public class CategoryService {
 
     public Category findByCategoryName(String categoryName){
         return iCategoryRepository.findByName(categoryName).stream().findFirst().orElse(null);
+    }
+
+    public List<Category> getAll(){
+        return (List<Category>) iCategoryRepository.findAll();
     }
 
     public String findByItem(Item item){

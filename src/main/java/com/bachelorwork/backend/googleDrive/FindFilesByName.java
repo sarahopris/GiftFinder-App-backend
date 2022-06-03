@@ -14,6 +14,10 @@ import com.google.api.services.drive.model.FileList;
 public class FindFilesByName {
 
     // com.google.api.services.drive.model.File
+    static long startTime = System.nanoTime();
+
+
+
     public static URL getGoogleFilesByName(String fileNameLike) throws IOException {
 
         Drive driveService = GoogleDriveUtils.getDriveService();
@@ -21,21 +25,23 @@ public class FindFilesByName {
         String pageToken = null;
         List<File> list = new ArrayList<File>();
 
-        String query = null;
-        if (rootFolderIdParent == null) {
-            query = " name = '" + fileNameLike + "' " //
-                    + " and mimeType != 'application/vnd.google-apps.folder' " //
-                    + " and 'root' in parents";
-        } else {
-            query = " name = '" + fileNameLike + "' " //
-                    + " and mimeType != 'application/vnd.google-apps.folder' " //
-                    + " and '" + rootFolderIdParent + "' in parents";
-        }
+//        String query = null;
+//        if (rootFolderIdParent == null) {
+//            query = " name = '" + fileNameLike + "' " //
+//                    + " and mimeType != 'application/vnd.google-apps.folder' " //
+//                    + " and 'root' in parents";
+//        } else {
+//            query = " name = '" + fileNameLike + "' " //
+//                    + " and mimeType != 'application/vnd.google-apps.folder' " //
+//                    + " and '" + rootFolderIdParent + "' in parents";
+//        }
 
         do {
-            FileList result = driveService.files().list().setQ(query).setSpaces("drive") //
+            FileList result = driveService.files().list().setQ(" name = '" + fileNameLike + "' " //
+                    + " and mimeType != 'application/vnd.google-apps.folder' " //
+                    + " and '" + rootFolderIdParent + "' in parents").setSpaces("drive") //
                     // Fields will be assigned values: id, name, createdTime, mimeType
-                    .setFields("nextPageToken, files(id, name, createdTime, mimeType)")//
+                    .setFields("nextPageToken, files(id, name)")//
                     .setPageToken(pageToken).execute();
             list.addAll(result.getFiles());
             pageToken = result.getNextPageToken();
@@ -45,12 +51,15 @@ public class FindFilesByName {
         return new URL(baseUrl,"uc?id=" + list.get(0).getId());
     }
 
+    static long endTime = System.nanoTime();
+    static long duration = (endTime - startTime);
+
 
 
     public static void main(String[] args) throws IOException {
 
         URL imgUrl = getGoogleFilesByName("makeup_table.jpg");
-
+        System.out.println(FindFilesByName.duration);
 //            System.out.println("Mime Type: " + folder.getMimeType() + " --- Name: " + folder.getName());
 
 

@@ -1,10 +1,7 @@
 package com.bachelorwork.backend.service;
 
 import com.bachelorwork.backend.googleDrive.FindFilesByName;
-import com.bachelorwork.backend.model.Category;
-import com.bachelorwork.backend.model.Item;
-import com.bachelorwork.backend.model.Tag;
-import com.bachelorwork.backend.model.User;
+import com.bachelorwork.backend.model.*;
 import com.bachelorwork.backend.repository.ICategoryRepository;
 import com.bachelorwork.backend.repository.ItemRepository;
 import net.minidev.json.JSONObject;
@@ -173,25 +170,28 @@ public class ItemService {
         return itemImageURL;
     }
 
-
+    static long startTime = System.nanoTime();
 
     @Transactional
     public List<JSONObject> getItemNameAndImage(List<Item> itemList) throws IOException {
         List<JSONObject> jsonObjects = new ArrayList<>();
-        for(Item item: itemList){
+        itemList.forEach(item -> {
             JSONObject itemsJSON = new JSONObject();
             itemsJSON.put("itemName", item.getItemName());
-            itemsJSON.put("category", categoryService.findByItem(item));
+            //itemsJSON.put("category", categoryService.findByItem(item));
             try {
                 itemsJSON.put("imgURL", FindFilesByName.getGoogleFilesByName(item.getImgName()));
             }
-            catch (IndexOutOfBoundsException indexOutOfBoundsException){
+            catch (IndexOutOfBoundsException | IOException indexOutOfBoundsException){
                 itemsJSON.put("imgURL", null);
             }
             jsonObjects.add(itemsJSON);
-        }
+        });
         return jsonObjects;
     }
+
+    static long endTime = System.nanoTime();
+    static long duration = (endTime - startTime);
 
 
 
@@ -217,6 +217,31 @@ public class ItemService {
             return new ResponseEntity<>("tags added", HttpStatus.OK);
         } else
             return new ResponseEntity<>("user not found", HttpStatus.NOT_FOUND);
+    }
+
+    public List<Tag> getAllTagsOfItem(Long itemId){
+        Item item = itemRepository.findById(itemId).stream().findFirst().orElse(null);
+        if(item != null)
+            return item.getTagList();
+        else
+            return null;
+    }
+
+    public List<Tag> getMandatoryTagsFromItem(Long itemId){
+        List<Tag> allItemTags = getAllTagsOfItem(itemId);
+        return allItemTags.stream()
+                .filter(tag -> tag.getMandatory() == 1)
+                .collect(Collectors.toList());
+    }
+
+    public List<Item> filteredItemsByMandatoryTags(List<Tag> selectedTags){
+        List<Item> allItems = (List<Item>) itemRepository.findAll();
+
+        List<Tag> mandatoryTags = selectedTags.stream().filter(tag->tag.getMandatory() == 1).collect(Collectors.toList());
+
+        return allItems.stream().
+                filter(item -> getMandatoryTagsFromItem(item.getIdItem()).containsAll(mandatoryTags)).collect(Collectors.toList());
+
     }
 
 }

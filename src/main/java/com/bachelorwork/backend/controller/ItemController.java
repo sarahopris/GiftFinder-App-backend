@@ -66,13 +66,19 @@ public class ItemController {
 
     /**
      * Method to retrieve items with their image URL and category
-     * @param itemList
      * @return list of JSON objects of type [ {itemName, itemImgURL, category} ]
      * @throws IOException
      */
     @GetMapping(value = "/getItemsLists", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public List<JSONObject> getItemsLists(@RequestBody List<Item> itemList) throws IOException {
-        return itemService.getItemNameAndImage(itemList);
+    public List<JSONObject> getItemsLists() throws IOException {
+        List<Item> allItems = itemService.findAll();
+        return itemService.getItemNameAndImage(allItems);
+    }
+
+    //list mandatoryTags o sa fie dce fapt lista cu toate tag-urile
+    @GetMapping(value = "/getFilteredItems")
+    public List<Item> filteredItems(@RequestParam List<Tag> selectedTags){
+        return itemService.filteredItemsByMandatoryTags(selectedTags);
     }
 }

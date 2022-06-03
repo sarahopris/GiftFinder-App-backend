@@ -1,5 +1,14 @@
 package com.bachelorwork.backend.algorithm;
 
+import com.bachelorwork.backend.model.Item;
+import com.bachelorwork.backend.model.Tag;
+import com.bachelorwork.backend.repository.ITagRepository;
+import com.bachelorwork.backend.repository.IUserRepository;
+import com.bachelorwork.backend.service.ItemService;
+import com.bachelorwork.backend.service.TagService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -9,20 +18,55 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
+@Service
 public class JaccardAlgorithm {
 
-    private Integer calculateJaccardIndex(final List<String> userTags, final List<String> itemTags) {
-        Set<String> intersectionSet = new HashSet<String>();
-        Set<String> unionSet = new HashSet<String>();
-        if (userTags.isEmpty() || itemTags.isEmpty()) {
-            return 0;
-        }
-        for (String userTag : userTags) {
-            unionSet.add(userTag);
-            for (String itemTag : itemTags) {
-                if (userTag.equals(itemTag)) {
-                    intersectionSet.add(userTag);
+    @Autowired
+    ITagRepository iTagRepository;
+
+    @Autowired
+    IUserRepository iUserRepository;
+
+    @Autowired
+    TagService tagService;
+
+    @Autowired
+    ItemService itemService;
+
+    @Autowired
+    FilterMandatoryTags filterMandatoryTags;
+
+
+//    private Integer calculateJaccardIndex(final List<String> userTags, final List<String> itemTags) {
+//        Set<String> intersectionSet = new HashSet<String>();
+//        Set<String> unionSet = new HashSet<String>();
+//        if (userTags.isEmpty() || itemTags.isEmpty()) {
+//            return 0;
+//        }
+//        for (String userTag : userTags) {
+//            unionSet.add(userTag);
+//            for (String itemTag : itemTags) {
+//                if (userTag.equals(itemTag)) {
+//                    intersectionSet.add(userTag);
+//                } else {
+//                    unionSet.add(itemTag);
+//                }
+//            }
+//        }
+//        return (int) Math.round((double) intersectionSet.size() / (double) unionSet.size() * 100);
+//    }
+    private Integer calculateJaccardIndex(List<Tag> selectedTags, List<Tag> itemTags) {
+        Set<Tag> intersectionSet = new HashSet<>();
+        Set<Tag> unionSet = new HashSet<>();
+
+
+//        filteredItemsList = itemService.filteredItemsByMandatoryTags(selectedTagList);
+
+        for (Tag selectedTag : selectedTags) {
+            unionSet.add(selectedTag);
+            for (Tag itemTag : itemTags) {
+                if (selectedTag.equals(itemTag)) {
+                    intersectionSet.add(selectedTag);
                 } else {
                     unionSet.add(itemTag);
                 }
@@ -31,22 +75,23 @@ public class JaccardAlgorithm {
         return (int) Math.round((double) intersectionSet.size() / (double) unionSet.size() * 100);
     }
 
-    public LinkedHashMap<String, Integer> calculateRelevantItemsMap() {
+    public LinkedHashMap<Long, Integer> calculateRelevantItemsMap(List<String> selectedTagLabels) {
 
-        Map<String, Integer> relevanceItemsMap = new LinkedHashMap<String, Integer>();
+        Map<Long, Integer> relevanceItemsMap = new LinkedHashMap<Long, Integer>();
+        List<Tag> selectedTags = new ArrayList<>();
+        selectedTagLabels.
+                forEach(tagName->
+                    selectedTags.add(tagService.findByTagName(tagName)));
+
+        List<Item> filteredItemsByMandatory = filterMandatoryTags.filteredItemsByMandatoryTags(selectedTagLabels);
 
         List<String> userTags = getUserTags();
+        filteredItemsByMandatory.forEach(item ->
+            relevanceItemsMap.put(item.getIdItem(),calculateJaccardIndex(selectedTags,item.getTagList()))
+        );
 
-        relevanceItemsMap.put("item1", calculateJaccardIndex(userTags, getItem1Tags()));
-        relevanceItemsMap.put("item2", calculateJaccardIndex(userTags, getItem2Tags()));
-        relevanceItemsMap.put("item3", calculateJaccardIndex(userTags, getItem3Tags()));
-        relevanceItemsMap.put("item4", calculateJaccardIndex(userTags, getItem4Tags()));
-        relevanceItemsMap.put("item5", calculateJaccardIndex(userTags, getItem5Tags()));
 
-        System.out.println("---------------------------"
-                        + relevanceItemsMap.entrySet().stream().collect(Collectors.toList()));
-
-        LinkedHashMap<String, Integer> sortedRelevanceItemsMap = new LinkedHashMap<>();
+        LinkedHashMap<Long, Integer> sortedRelevanceItemsMap = new LinkedHashMap<>();
 
         // Use Comparator.reverseOrder() for reverse ordering
         relevanceItemsMap.entrySet().stream().filter(item -> item.getValue() > 0)

@@ -4,6 +4,7 @@ import com.bachelorwork.backend.model.*;
 import com.bachelorwork.backend.repository.IReceiverRepository;
 import com.bachelorwork.backend.repository.ITagRepository;
 import com.bachelorwork.backend.repository.IUserRepository;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -127,5 +128,39 @@ public class ReceiverService {
             return new ResponseEntity<>("Failed to add receiver", HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+    }
+
+    public List<Tag> getAllReceiverTags(Long receiverId, Long userId){
+        Optional<User> user = iUserRepository.findById(userId);
+        Receiver receiver;
+        if(user.isPresent()) {
+            receiver = user.get().getReceiversList().stream()
+                    .filter(receiverElem -> receiverElem.getId().equals(receiverId))
+                    .findFirst().orElse(null);
+            if(receiver != null)
+                return receiver.getTagList();
+
+        }
+        return null;
+    }
+
+    public List<Tag> getMandatoryTagsFromReceiver(Long receiverId, Long userId){
+        List<Tag> allTagsOfReceiver = getAllReceiverTags(receiverId, userId);
+        return allTagsOfReceiver.stream().filter(tag -> tag.getMandatory()==1).collect(Collectors.toList());
+
+    }
+
+    public List<JSONObject> getAllReceiversFromUser(String username){
+        Optional<User> user = iUserRepository.findUserByUsername(username);
+        List<JSONObject> jsonList = new ArrayList<>();
+
+        user.ifPresent(value -> value.getReceiversList().forEach(receiver -> {
+            JSONObject jsonObj = new JSONObject();
+            jsonObj.put("receiverName", receiver.getName());
+            jsonObj.put("tags", receiver.getTagList());
+            jsonList.add(jsonObj);
+        }));
+
+        return jsonList;
     }
 }

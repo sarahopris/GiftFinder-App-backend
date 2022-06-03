@@ -43,7 +43,7 @@ public class TagService {
             } else {
                 tagToAdd.setTagName(tag.getTagName());
 
-                if (tag.getMandatory() != 1) {
+                if (tag.getMandatory() != 1 || tag.getMandatory() == null) {
                     tagToAdd.setMandatory((short) 0);
                 } else tagToAdd.setMandatory(tag.getMandatory());
 
