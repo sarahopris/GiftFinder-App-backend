@@ -37,7 +37,7 @@ public class FindFilesByName {
 //        }
 
         do {
-            FileList result = driveService.files().list().setQ(" name = '" + fileNameLike + "' " //
+            FileList result = driveService.files().list().setQ(" name ='" + fileNameLike + "' " //
                     + " and mimeType != 'application/vnd.google-apps.folder' " //
                     + " and '" + rootFolderIdParent + "' in parents").setSpaces("drive") //
                     // Fields will be assigned values: id, name, createdTime, mimeType

@@ -154,10 +154,8 @@ public class ItemService {
                 iCategoryRepository.save(category);
         }
     }
-
         return new ResponseEntity<>("items added",
                 HttpStatus.OK);
-
     }
 
 
@@ -178,7 +176,7 @@ public class ItemService {
         itemList.forEach(item -> {
             JSONObject itemsJSON = new JSONObject();
             itemsJSON.put("itemName", item.getItemName());
-            //itemsJSON.put("category", categoryService.findByItem(item));
+            itemsJSON.put("category", item.getCategory().getName());
             try {
                 itemsJSON.put("imgURL", FindFilesByName.getGoogleFilesByName(item.getImgName()));
             }
@@ -196,8 +194,8 @@ public class ItemService {
 
 
     @Transactional
-    public ResponseEntity<?> addTagToItem(String itemName, String[] tagNames) {
-        Optional<Item> item = itemRepository.findByItemName(itemName);
+    public ResponseEntity<?> addTagToItem(Long itemId, String[] tagNames) {
+        Optional<Item> item = itemRepository.findById(itemId);
         //Tag tag  = tagService.findByTagName(tagName);
 
         if (item.isPresent()) {

@@ -4,6 +4,7 @@ import com.bachelorwork.backend.model.Item;
 import com.bachelorwork.backend.model.Tag;
 import com.bachelorwork.backend.repository.ITagRepository;
 import com.bachelorwork.backend.repository.IUserRepository;
+import com.bachelorwork.backend.repository.ItemRepository;
 import com.bachelorwork.backend.service.ItemService;
 import com.bachelorwork.backend.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ public class JaccardAlgorithm {
 
     @Autowired
     IUserRepository iUserRepository;
+
+    @Autowired
+    ItemRepository itemRepository;
 
     @Autowired
     TagService tagService;
@@ -75,6 +79,8 @@ public class JaccardAlgorithm {
         return (int) Math.round((double) intersectionSet.size() / (double) unionSet.size() * 100);
     }
 
+
+
     public LinkedHashMap<Long, Integer> calculateRelevantItemsMap(List<String> selectedTagLabels) {
 
         Map<Long, Integer> relevanceItemsMap = new LinkedHashMap<Long, Integer>();
@@ -100,6 +106,14 @@ public class JaccardAlgorithm {
 
         return sortedRelevanceItemsMap;
 
+    }
+
+    public List<Item> resultedItems(List<String> selectedTagLabels){
+        LinkedHashMap<Long,Integer> sortedRelevanceItems = calculateRelevantItemsMap(selectedTagLabels);
+        List<Item> sortedItems = new ArrayList<>();
+        sortedRelevanceItems.keySet()
+                .forEach(id-> sortedItems.add(itemRepository.findById(id).stream().findFirst().orElse(null)));
+        return sortedItems;
     }
 
     public List<String> getSortedRelevanceItems(final LinkedHashMap<String, Integer> sortedRelevanceItemsMap) {

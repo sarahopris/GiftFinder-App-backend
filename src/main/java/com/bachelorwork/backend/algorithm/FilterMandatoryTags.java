@@ -31,10 +31,10 @@ public class FilterMandatoryTags {
     @Autowired
     TagService tagService;
 
-    public List<Item> filteredItemsByMandatoryTags(List<String> selectedTagsId){
+    public List<Item> filteredItemsByMandatoryTags(List<String> selectedTagsNames){
         List<Item> allItems = (List<Item>) itemRepository.findAll();
         List<Tag> selectedTags = new ArrayList<>();
-        selectedTagsId.
+        selectedTagsNames.
                 forEach(tagName->
                     selectedTags.add(tagService.findByTagName(tagName)));
 

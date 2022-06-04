@@ -1,5 +1,7 @@
 package com.bachelorwork.backend.controller;
 
+import com.bachelorwork.backend.algorithm.FilterMandatoryTags;
+import com.bachelorwork.backend.algorithm.JaccardAlgorithm;
 import com.bachelorwork.backend.model.Category;
 import com.bachelorwork.backend.model.Item;
 import com.bachelorwork.backend.model.Tag;
@@ -23,6 +25,12 @@ public class ItemController {
 
     @Autowired
     ItemService itemService;
+
+    @Autowired
+    FilterMandatoryTags filterMandatoryTags;
+
+    @Autowired
+    JaccardAlgorithm jaccardAlgorithm;
 
     @PostMapping("/addItem")
     public ResponseEntity<?> addItem(@RequestBody Item item, @RequestParam String categoryName){
@@ -54,8 +62,8 @@ public class ItemController {
 //    }
 
     @PostMapping("/addTagsToItem")
-    public ResponseEntity<?> addTagsToItem(@RequestParam String item,@RequestParam String[] tags){
-        return itemService.addTagToItem(item,tags);
+    public ResponseEntity<?> addTagsToItem(@RequestParam Long itemId,@RequestParam String[] tags){
+        return itemService.addTagToItem(itemId,tags);
     }
 
     @PostMapping(value = "/addItems", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -76,9 +84,21 @@ public class ItemController {
         return itemService.getItemNameAndImage(allItems);
     }
 
-    //list mandatoryTags o sa fie dce fapt lista cu toate tag-urile
-    @GetMapping(value = "/getFilteredItems")
-    public List<Item> filteredItems(@RequestParam List<Tag> selectedTags){
-        return itemService.filteredItemsByMandatoryTags(selectedTags);
+//    //list mandatoryTags o sa fie dce fapt lista cu toate tag-urile
+//    @GetMapping(value = "/getFilteredItems")
+//    public List<Item> filteredItems(@RequestParam List<String> selectedTags){
+//        return filterMandatoryTags.filteredItemsByMandatoryTags(selectedTags);
+//    }
+
+    /**
+     *
+     * @param selectedTagNames - List of tag labels
+     * @return filered elements based on selected tags
+     */
+    @GetMapping(value= "/getSuggestedItems", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<JSONObject> getSuggestedItemsFromAlgorithm(@RequestBody List<String> selectedTagNames) throws IOException {
+        List<Item> suggestedItemList = jaccardAlgorithm.resultedItems(selectedTagNames);
+        return itemService.getItemNameAndImage(suggestedItemList);
     }
+
 }
