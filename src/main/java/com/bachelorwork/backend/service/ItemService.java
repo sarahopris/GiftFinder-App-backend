@@ -177,12 +177,7 @@ public class ItemService {
             JSONObject itemsJSON = new JSONObject();
             itemsJSON.put("itemName", item.getItemName());
             itemsJSON.put("category", item.getCategory().getName());
-            try {
-                itemsJSON.put("imgURL", FindFilesByName.getGoogleFilesByName(item.getImgName()));
-            }
-            catch (IndexOutOfBoundsException | IOException indexOutOfBoundsException){
-                itemsJSON.put("imgURL", null);
-            }
+            itemsJSON.put("imgURL", item.getImgName());
             jsonObjects.add(itemsJSON);
         });
         return jsonObjects;
@@ -216,6 +211,27 @@ public class ItemService {
         } else
             return new ResponseEntity<>("user not found", HttpStatus.NOT_FOUND);
     }
+
+
+    public ResponseEntity<?> addNewItemWithTags(String itemName, String categoryName, String itemImageName, String[] tagNames){
+       Item newItem = Item.builder()
+               .itemName(itemName)
+               .imgName(itemImageName)
+               .build();
+        ResponseEntity<?> addedItemResponse = addItem(newItem,categoryName);
+
+        if(addedItemResponse.equals(new ResponseEntity<>("item added",
+                HttpStatus.OK))){
+            Item item = findAll().stream().filter(i ->
+            i.getItemName().equals(newItem.getItemName()) && i.getImgName().equals(newItem.getImgName())).findFirst().orElse(null);
+            if(item != null)
+                return addTagToItem(item.getIdItem(), tagNames);
+            else
+                return new ResponseEntity<>("item is null", HttpStatus.NOT_FOUND);
+        }
+        return addedItemResponse;
+    }
+
 
     public List<Tag> getAllTagsOfItem(Long itemId){
         Item item = itemRepository.findById(itemId).stream().findFirst().orElse(null);

@@ -37,6 +37,11 @@ public class ItemController {
         return itemService.addItem(item, categoryName);
     }
 
+    @PostMapping("/addNewItemWithTags")
+    public ResponseEntity<?> addNewItemWithTags(@RequestParam String itemName, @RequestParam String categoryName, @RequestParam String imgName, @RequestParam String[] tags){
+        return itemService.addNewItemWithTags(itemName, categoryName, imgName, tags);
+    }
+
     @GetMapping(value = "/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public List<Item> getItems(){
@@ -96,7 +101,7 @@ public class ItemController {
      * @return filered elements based on selected tags
      */
     @GetMapping(value= "/getSuggestedItems", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<JSONObject> getSuggestedItemsFromAlgorithm(@RequestBody List<String> selectedTagNames) throws IOException {
+    public List<JSONObject> getSuggestedItemsFromAlgorithm(@RequestParam List<String> selectedTagNames) throws IOException {
         List<Item> suggestedItemList = jaccardAlgorithm.resultedItems(selectedTagNames);
         return itemService.getItemNameAndImage(suggestedItemList);
     }
