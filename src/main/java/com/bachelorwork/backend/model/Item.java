@@ -34,5 +34,9 @@ public class Item {
             inverseJoinColumns = @JoinColumn( name = "tags_id_tags"))
     private List<Tag> tagList = new ArrayList<>();
 
-
+    @Transient
+    public String getImagePath(){
+        if (imgName == null) return null;
+        return "/zgiftFinderPics/" + imgName;
+    }
 }

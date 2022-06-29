@@ -41,30 +41,9 @@ public class JaccardAlgorithm {
     FilterMandatoryTags filterMandatoryTags;
 
 
-//    private Integer calculateJaccardIndex(final List<String> userTags, final List<String> itemTags) {
-//        Set<String> intersectionSet = new HashSet<String>();
-//        Set<String> unionSet = new HashSet<String>();
-//        if (userTags.isEmpty() || itemTags.isEmpty()) {
-//            return 0;
-//        }
-//        for (String userTag : userTags) {
-//            unionSet.add(userTag);
-//            for (String itemTag : itemTags) {
-//                if (userTag.equals(itemTag)) {
-//                    intersectionSet.add(userTag);
-//                } else {
-//                    unionSet.add(itemTag);
-//                }
-//            }
-//        }
-//        return (int) Math.round((double) intersectionSet.size() / (double) unionSet.size() * 100);
-//    }
     private Integer calculateJaccardIndex(List<Tag> selectedTags, List<Tag> itemTags) {
         Set<Tag> intersectionSet = new HashSet<>();
         Set<Tag> unionSet = new HashSet<>();
-
-
-//        filteredItemsList = itemService.filteredItemsByMandatoryTags(selectedTagList);
 
         for (Tag selectedTag : selectedTags) {
             unionSet.add(selectedTag);
@@ -80,7 +59,6 @@ public class JaccardAlgorithm {
     }
 
 
-
     public LinkedHashMap<Long, Integer> calculateRelevantItemsMap(List<String> selectedTagLabels) {
 
         Map<Long, Integer> relevanceItemsMap = new LinkedHashMap<Long, Integer>();
@@ -91,7 +69,6 @@ public class JaccardAlgorithm {
 
         List<Item> filteredItemsByMandatory = filterMandatoryTags.filteredItemsByMandatoryTags(selectedTagLabels);
 
-        List<String> userTags = getUserTags();
         filteredItemsByMandatory.forEach(item ->
             relevanceItemsMap.put(item.getIdItem(),calculateJaccardIndex(selectedTags,item.getTagList()))
         );
@@ -114,66 +91,5 @@ public class JaccardAlgorithm {
         sortedRelevanceItems.keySet()
                 .forEach(id-> sortedItems.add(itemRepository.findById(id).stream().findFirst().orElse(null)));
         return sortedItems;
-    }
-
-    public List<String> getSortedRelevanceItems(final LinkedHashMap<String, Integer> sortedRelevanceItemsMap) {
-        return sortedRelevanceItemsMap.entrySet().stream().filter(item -> item.getValue() > 0)
-                        .map(entry -> entry.getKey().toString()).collect(Collectors.toList());
-    }
-
-    private List<String> getUserTags() {
-        List<String> userTags = new ArrayList<String>();
-        userTags.add("sport");
-        userTags.add("boy");
-        userTags.add("child");
-        userTags.add("music");
-        userTags.add("travel");
-        return userTags;
-    }
-
-    private List<String> getItem1Tags() {
-        // guitar
-        List<String> itemTag = new ArrayList<String>();
-        itemTag.add("girl");
-        itemTag.add("copil");
-        itemTag.add("music");
-        return itemTag;
-    }
-
-    private List<String> getItem2Tags() {
-        // doll
-        List<String> itemTag = new ArrayList<String>();
-        itemTag.add("girl");
-        itemTag.add("copil");
-        itemTag.add("music");
-        itemTag.add("travel");
-        return itemTag;
-    }
-
-    private List<String> getItem3Tags() {
-        // rucksac
-        List<String> itemTag = new ArrayList<String>();
-        itemTag.add("sport");
-        itemTag.add("travel");
-        return itemTag;
-    }
-
-    private List<String> getItem4Tags() {
-        // rucksac
-        List<String> itemTag = new ArrayList<String>();
-        itemTag.add("old");
-        itemTag.add("reading");
-        itemTag.add("fishing");
-        return itemTag;
-    }
-
-    private List<String> getItem5Tags() {
-        List<String> itemTag = new ArrayList<String>();
-        itemTag.add("sport");
-        itemTag.add("boy");
-        itemTag.add("child");
-        itemTag.add("music");
-        itemTag.add("travel");
-        return itemTag;
     }
 }

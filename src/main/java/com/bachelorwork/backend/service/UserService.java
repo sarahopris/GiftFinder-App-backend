@@ -56,11 +56,7 @@ public class UserService {
                 .email(userDTO.getEmail())
                 .username(userDTO.getUsername())
                 .password(userDTO.getPassword())
-                .mandatoryTags(userDTO.getMandatoryTags())
-                .optionalTags(userDTO.getOptionalTags())
-//                .password(passwordEncoder.encode(userDTO.getPassword()))
-
-                // .userNotificationsList(userDTO.getUserNotificationsList())
+                .receiversList(userDTO.getReceiversList())
                 .build();
     }
 
@@ -71,47 +67,14 @@ public class UserService {
                 .email(user.getEmail())
                 .username(user.getUsername())
                 .token(user.getToken())
-//                .password(user.getPassword())
-                .mandatoryTags(user.getMandatoryTags())
-                .optionalTags(user.getOptionalTags())
+                .receiversList(user.getReceiversList())
                 .build();
-//        userDTO.add(linkTo(UserController.class).slash(user.getIdUser()).withSelfRel());
-//        userDTO.add(linkTo(methodOn(BugController.class).findBugsAssignedTo(userDTO.getUsername())).withRel("AsignedTo"));
-//        userDTO.add(linkTo(methodOn(BugController.class).findBugsCreatedBy(userDTO.getUsername())).withRel("CreatedBy"));
         return userDTO;
     }
 
 
-    public String generateUsername(String firstName, String lastName) {
-        firstName = firstName.toLowerCase(Locale.ROOT);
-        lastName = lastName.toLowerCase(Locale.ROOT);
-        int i = 1;
-        String prenume = "";
-        String nume = "";
-        if (lastName.length() >= 5) {
-            prenume = Character.toString(firstName.charAt(0));
-            nume = lastName.substring(0, 5);
-        } else {
-            prenume = firstName.substring(0, 3);
-            nume = lastName;
-        }
-
-        String username = nume + prenume;
-        while (iUserRepository.findByUsername(username) != null) {
-            username = nume + prenume + Integer.toString(i);
-            i++;
-        }
-
-        return username.toLowerCase();
-
-    }
-
     @Transactional
     public ResponseEntity<?> addUser(UserDTO userDTO) {
-//         username and email can not be null
-//        if ( userDTO.getUsername() == null || userDTO.getEmail() == null) {
-//            return "User not added to the database! You have to specify your username and email to be able to add a new user.";
-//        }
         userDTO.setUsername(userDTO.getUsername());
         User user = convertToUser(userDTO);
         if (user.isValidPassword()) {

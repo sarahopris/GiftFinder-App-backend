@@ -4,17 +4,17 @@ import com.bachelorwork.backend.algorithm.FilterMandatoryTags;
 import com.bachelorwork.backend.algorithm.JaccardAlgorithm;
 import com.bachelorwork.backend.model.Category;
 import com.bachelorwork.backend.model.Item;
-import com.bachelorwork.backend.model.Tag;
+import com.bachelorwork.backend.service.FileUploadUtil;
 import com.bachelorwork.backend.service.ItemService;
 import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.CascadeType;
 import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +38,10 @@ public class ItemController {
     }
 
     @PostMapping("/addNewItemWithTags")
-    public ResponseEntity<?> addNewItemWithTags(@RequestParam String itemName, @RequestParam String categoryName, @RequestParam String imgName, @RequestParam String[] tags){
+    public ResponseEntity<?> addNewItemWithTags(@RequestParam String itemName, @RequestParam String categoryName, @RequestParam("image") MultipartFile multipartFile, @RequestParam String[] tags) throws IOException {
+        String imgName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+        String uploadDir = "zgiftFinderPics/" + imgName;
+        FileUploadUtil.saveFile(uploadDir, imgName,multipartFile);
         return itemService.addNewItemWithTags(itemName, categoryName, imgName, tags);
     }
 
@@ -55,16 +58,12 @@ public class ItemController {
         return itemService.findByCategory(category);
     }
 
-//    @GetMapping(value = "/getItemsListsByCategory", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @ResponseBody
-//    public List<JSONObject> getItemsListsByCategory(){
-//        return itemService.getItemListsByCategories();
-//    }
+    @GetMapping(value = "/getItemsListsByCategory", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public List<JSONObject> getItemsListsByCategory(){
+        return itemService.getItemListsByCategories();
+    }
 
-//    @GetMapping(value="/getImageURL")
-//    public Map<String, URL> getItemImageURL(@RequestBody Item item) throws IOException {
-//        return itemService.getItemImageURL(item);
-//    }
 
     @PostMapping("/addTagsToItem")
     public ResponseEntity<?> addTagsToItem(@RequestParam Long itemId,@RequestParam String[] tags){
@@ -89,16 +88,11 @@ public class ItemController {
         return itemService.getItemNameAndImage(allItems);
     }
 
-//    //list mandatoryTags o sa fie dce fapt lista cu toate tag-urile
-//    @GetMapping(value = "/getFilteredItems")
-//    public List<Item> filteredItems(@RequestParam List<String> selectedTags){
-//        return filterMandatoryTags.filteredItemsByMandatoryTags(selectedTags);
-//    }
 
     /**
      *
      * @param selectedTagNames - List of tag labels
-     * @return filered elements based on selected tags
+     * @return filtered elements based on selected tags
      */
     @GetMapping(value= "/getSuggestedItems", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<JSONObject> getSuggestedItemsFromAlgorithm(@RequestParam List<String> selectedTagNames) throws IOException {

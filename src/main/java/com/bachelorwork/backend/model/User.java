@@ -28,20 +28,6 @@ public class User {
     private String username;
 
     private String password;
-
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_tag",
-                joinColumns = @JoinColumn(name = "users_id_user"),
-                inverseJoinColumns = @JoinColumn( name = "tags_id_tags"))
-    private List<Tag> optionalTags = new ArrayList<>();
-
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_tag",
-            joinColumns = @JoinColumn(name = "users_id_user"),
-            inverseJoinColumns = @JoinColumn( name = "tags_id_tags"))
-    private List<Tag> mandatoryTags = new ArrayList<>();
     private String token;
 
 

@@ -23,27 +23,25 @@ public class ReceiverController {
     @Autowired
     FilterMandatoryTags filterMandatoryTags;
 
-    @PostMapping("/addReceiverToUser")
-    public ResponseEntity<?> addReceiver(@RequestParam String receiverName, @RequestParam String username){
-        return receiverService.addReceiver(receiverName, username);
-    }
+//    @PostMapping("/addReceiverToUser")
+//    public ResponseEntity<?> addReceiver(@RequestParam String receiverName, @RequestParam String username){
+//        return receiverService.addReceiver(receiverName, username);
+//    }
 
     @DeleteMapping("/deleteReceiver")
     public ResponseEntity<?> deleteReceiver(@RequestParam String receiverName){
         return receiverService.removeReceiver(receiverName);
     }
 
-
-
     /**
-     * @param receiverName
-     * @param tags
-     * @param username
+     * @param receiverName - numele receiverului
+     * @param tags - label-urile tag urilor
+     * @param username-
      * @return ResponseEntity OK - if Receiver and Tags added successfully
      */
     @PostMapping("/addTagsToReceiver")
     public ResponseEntity<?> addTagsToReceiver(@RequestParam String receiverName, @RequestParam String[] tags, @RequestParam String username){
-        return receiverService.addTagToReceiver(receiverName, tags, username);
+        return receiverService.addReceiverWithTags(receiverName, tags, username);
     }
 
     //get all receivers with their tags

@@ -1,18 +1,19 @@
 package com.bachelorwork.backend.service;
 
-import com.bachelorwork.backend.googleDrive.FindFilesByName;
 import com.bachelorwork.backend.model.*;
 import com.bachelorwork.backend.repository.ICategoryRepository;
 import com.bachelorwork.backend.repository.ItemRepository;
 import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -125,6 +126,9 @@ public class ItemService {
         category.setItemList(category.getItemList());
         itemRepository.save(item);
         iCategoryRepository.save(category);
+        String uploadDir = "giftFinderPics/";
+
+        //FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
 
         return new ResponseEntity<>("item added",
                 HttpStatus.OK);
@@ -160,31 +164,35 @@ public class ItemService {
 
 
     @Transactional
-    public Map<String, URL> getItemImageURL(Item item) throws IOException {
-        Map<String, URL> itemImageURL = new HashMap<>();
-        if(itemRepository.findByItemName(item.getItemName()).isEmpty())
-            return null;
-        itemImageURL.put(item.getItemName(),FindFilesByName.getGoogleFilesByName(item.getImgName()));
-        return itemImageURL;
-    }
-
-    static long startTime = System.nanoTime();
-
-    @Transactional
     public List<JSONObject> getItemNameAndImage(List<Item> itemList) throws IOException {
+
         List<JSONObject> jsonObjects = new ArrayList<>();
         itemList.forEach(item -> {
+
+            File file = null;
+            try {
+                file = new ClassPathResource(item.getImagePath()).getFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                String encodeImage = Base64.getEncoder().withoutPadding().encodeToString(Files.readAllBytes(file.toPath()));
+
             JSONObject itemsJSON = new JSONObject();
             itemsJSON.put("itemName", item.getItemName());
             itemsJSON.put("category", item.getCategory().getName());
             itemsJSON.put("imgURL", item.getImgName());
+            itemsJSON.put("imgContent", encodeImage);
+//            itemsJSON.put("imgURL", item.getImagePath());
             jsonObjects.add(itemsJSON);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
         return jsonObjects;
     }
-
-    static long endTime = System.nanoTime();
-    static long duration = (endTime - startTime);
 
 
 
@@ -212,20 +220,32 @@ public class ItemService {
             return new ResponseEntity<>("user not found", HttpStatus.NOT_FOUND);
     }
 
-
+    /**
+     *
+     * @param itemName - the name of the item
+     * @param categoryName - the item's category
+     * @param itemImageName - the name of the image corresponding to the item
+     * @param tagNames - the tags that describe the item
+     * @return Http response OK if the item along with the tags were successfully added
+     */
     public ResponseEntity<?> addNewItemWithTags(String itemName, String categoryName, String itemImageName, String[] tagNames){
        Item newItem = Item.builder()
                .itemName(itemName)
                .imgName(itemImageName)
                .build();
+        Item item = findAll().stream().filter(i ->
+                i.getItemName().equals(newItem.getItemName()) && i.getImgName().equals(newItem.getImgName()) && i.getTagList().isEmpty()).findFirst().orElse(null);
+        if(item != null)
+            return addTagToItem(item.getIdItem(), tagNames);
+
         ResponseEntity<?> addedItemResponse = addItem(newItem,categoryName);
 
         if(addedItemResponse.equals(new ResponseEntity<>("item added",
                 HttpStatus.OK))){
-            Item item = findAll().stream().filter(i ->
+            Item itemToAdd = findAll().stream().filter(i ->
             i.getItemName().equals(newItem.getItemName()) && i.getImgName().equals(newItem.getImgName())).findFirst().orElse(null);
-            if(item != null)
-                return addTagToItem(item.getIdItem(), tagNames);
+            if(itemToAdd != null)
+                return addTagToItem(itemToAdd.getIdItem(), tagNames);
             else
                 return new ResponseEntity<>("item is null", HttpStatus.NOT_FOUND);
         }

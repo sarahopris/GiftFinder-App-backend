@@ -1,5 +1,6 @@
 package com.bachelorwork.backend.dto;
 
+import com.bachelorwork.backend.model.Receiver;
 import com.bachelorwork.backend.model.Tag;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
@@ -20,9 +21,8 @@ public class UserDTO extends RepresentationModel<UserDTO> {
     private String email;
     private String username;
     private String password;
-    private List<Tag> mandatoryTags;
-    private List<Tag> optionalTags;
     private String token;
+    private List<Receiver> receiversList;
 
 
     public boolean isValid() {
