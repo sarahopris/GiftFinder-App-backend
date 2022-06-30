@@ -57,6 +57,7 @@ public class UserService {
                 .username(userDTO.getUsername())
                 .password(userDTO.getPassword())
                 .receiversList(userDTO.getReceiversList())
+                .admin(userDTO.getAdmin())
                 .build();
     }
 
@@ -68,6 +69,7 @@ public class UserService {
                 .username(user.getUsername())
                 .token(user.getToken())
                 .receiversList(user.getReceiversList())
+                .admin(user.getAdmin())
                 .build();
         return userDTO;
     }
@@ -81,6 +83,7 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         } else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if (user.isValidEmail()) {
+            user.setAdmin((short)0);
             iUserRepository.save(user);
             return new ResponseEntity<>(HttpStatus.OK);
         } else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

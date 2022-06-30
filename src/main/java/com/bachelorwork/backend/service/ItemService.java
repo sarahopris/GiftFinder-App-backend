@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -126,7 +128,7 @@ public class ItemService {
         category.setItemList(category.getItemList());
         itemRepository.save(item);
         iCategoryRepository.save(category);
-        String uploadDir = "giftFinderPics/";
+        //String uploadDir = "giftFinderPics/";
 
         //FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
 
@@ -165,18 +167,14 @@ public class ItemService {
 
     @Transactional
     public List<JSONObject> getItemNameAndImage(List<Item> itemList) throws IOException {
-
+        MvcConfig mvcConfig = new MvcConfig();
+        String EXTERNAL_FILE_PATH = mvcConfig.giveAbsolutePath("zgiftFinderPics/");
         List<JSONObject> jsonObjects = new ArrayList<>();
         itemList.forEach(item -> {
 
-            File file = null;
             try {
-                file = new ClassPathResource(item.getImagePath()).getFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
+                String path = EXTERNAL_FILE_PATH + "/" + item.getImgName();
+                File file = Paths.get(path).toFile();
                 String encodeImage = Base64.getEncoder().withoutPadding().encodeToString(Files.readAllBytes(file.toPath()));
 
             JSONObject itemsJSON = new JSONObject();

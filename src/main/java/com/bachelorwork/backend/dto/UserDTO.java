@@ -22,6 +22,7 @@ public class UserDTO extends RepresentationModel<UserDTO> {
     private String username;
     private String password;
     private String token;
+    private Short admin;
     private List<Receiver> receiversList;
 
 

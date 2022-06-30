@@ -40,7 +40,7 @@ public class ItemController {
     @PostMapping("/addNewItemWithTags")
     public ResponseEntity<?> addNewItemWithTags(@RequestParam String itemName, @RequestParam String categoryName, @RequestParam("image") MultipartFile multipartFile, @RequestParam String[] tags) throws IOException {
         String imgName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-        String uploadDir = "zgiftFinderPics/" + imgName;
+        String uploadDir = "zgiftFinderPics";
         FileUploadUtil.saveFile(uploadDir, imgName,multipartFile);
         return itemService.addNewItemWithTags(itemName, categoryName, imgName, tags);
     }

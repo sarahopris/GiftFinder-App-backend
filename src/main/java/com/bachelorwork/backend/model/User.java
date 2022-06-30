@@ -30,6 +30,7 @@ public class User {
     private String password;
     private String token;
 
+    private Short admin;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Receiver> receiversList;

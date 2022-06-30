@@ -12,7 +12,7 @@ public class MvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        exposeDirectory("giftFinderPics", registry);
+        exposeDirectory("zgiftFinderPics", registry);
     }
 
     private void exposeDirectory(String dirName, ResourceHandlerRegistry registry) {
@@ -21,6 +21,10 @@ public class MvcConfig implements WebMvcConfigurer {
         System.out.println("Upload path ul" +uploadPath);
         if (dirName.startsWith("../")) dirName = dirName.replace("../", "");
 
-        registry.addResourceHandler("/" + dirName + "/**").addResourceLocations("file:/"+ uploadPath + "/");
+        registry.addResourceHandler("/" + dirName + "/").addResourceLocations("file:/"+ uploadPath + "/");
+    }
+    public String giveAbsolutePath(String dirName){
+        Path uploadDir = Paths.get(dirName);
+        return uploadDir.toFile().getAbsolutePath();
     }
 }
